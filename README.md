@@ -12,3 +12,6 @@ Ghost_Trap Mega_tx is designed around a Arduino Mega with a Adafruit Musicmaker 
 and a separate controller for the servo motors. This requires the NeoPixels Metro to be uploaded to your Uno based microcontroller. 
 
 Each code file has full clear instructions for setup and installation.
+
+See video functionality:
+[![Watch the video](https://img.youtube.com/vi/P5palpay0MA/maxresdefault.jpg)](https://youtu.be/P5palpay0MA)
