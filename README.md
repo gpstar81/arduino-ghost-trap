@@ -14,4 +14,5 @@ and a separate controller for the servo motors. This requires the NeoPixels Metr
 Each code file has full clear instructions for setup and installation.
 
 See video functionality:
+https://www.youtube.com/watch?v=P5palpay0MA
 [![Watch the video](https://img.youtube.com/vi/P5palpay0MA/maxresdefault.jpg)](https://youtu.be/P5palpay0MA)
