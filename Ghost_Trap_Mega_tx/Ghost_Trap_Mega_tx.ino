@@ -73,7 +73,7 @@ uint8_t volumeR = 0;
 uint8_t volumeL = 0;
 uint8_t volumeMidL = 30; // Used on bargraph sound effects.
 uint8_t volumeMidR = 30; // Used on bargraph sound effects.
-uint8_t volInt = 1;
+uint8_t volInt = 3;
 long volumeBuffer = 0;
 boolean b_volume = false; // used to know if playing high or medium volume when adjusting the volume.
 
@@ -258,7 +258,7 @@ void setup() {
   pinMode(ledRed, OUTPUT);
   
   // Make sure the NeoPixels are off.
-  Serial.write(1);   
+  Serial1.write(1);   
 
   // Make sure smoke pump is inactive
   smokeOff();
@@ -479,11 +479,11 @@ void loop() {
 void trapOpen() {
   // Opening trap in Misc mode.
   if(rSwitchCurrentPosition == 5 || rSwitchCurrentPosition == 6) {
-    Serial.write(2);   
+    Serial1.write(2);   
   }
   else {
     // GB1 or GB2 opening.
-    Serial.write(3);   
+    Serial1.write(3);   
   }
   
   musicPlayer.stopPlaying();
@@ -510,9 +510,9 @@ void trapOpen() {
      trapState = 1;
      //Serial.println(F("** TRAP OPENED (State: 1) **"));
   }
-  else {       
+  else {    
     boolean b_trapOpen = true;
-    Serial.write(4);
+    Serial1.write(4);
     while(b_trapOpen == true) {
       if(Serial1.available() > 0) {
         b_trapOpen = false;
@@ -534,50 +534,44 @@ void trapCapture_Misc() {
   musicPlayer.setVolume(volumeL, volumeR);
   musicPlayer.startPlayingFile("capmisc.mp3");
 
-  boolean b_wait = true;
-
   // NeoPixels burst
-  Serial.write(15);
-  while(b_wait == true) {
-    if(Serial1.available() > 0) {
-      b_wait = false;
-    }
-  }
-
+  Serial1.write(15);
+  delay(10);
+  
   // Reset the strobe values.
-  Serial.write(7);
+  Serial1.write(7);
 
   boolean b_doorsOpen = true;
   boolean b_light = true;
   float timer1Secs = 0;
   startTimer1();
-  
+
   while(capturing == true) {   
     timer1Secs = getTimer1Seconds(); 
-
+        
     // Update strobe values.
-    Serial.write(8);
-          
+    Serial1.write(8);
+
     if(captureDelay.remaining() <= 4500) {
-      // Strobe colours up.
-      Serial.write(16);
+      // Strobe up
+      Serial1.write(16);
       trapDelay(20);
       
       // Strobe down
-      Serial.write(10);
+      Serial1.write(10);
       trapDelay(20);
     }
     else if(captureDelay.remaining() <= 6000) {
-      // Strobe colours up.
-      Serial.write(17);
+      // Strobe pixel colours up
+      Serial1.write(17);
       trapDelay(20);
-      
+
       // Strobe down
-      Serial.write(10);
+      Serial1.write(10);
       trapDelay(20);
     }
     else if(captureDelay.remaining() <= 6500) {
-      // Strobe colours up.
+      // Strobe pixel colours up
       Serial1.write(18);
       trapDelay(20);
 
@@ -586,7 +580,7 @@ void trapCapture_Misc() {
       trapDelay(20);
     }
     else if(captureDelay.remaining() <= 7000) {
-      // Strobe colours up.
+      // Strobe pixel colours up
       Serial1.write(19);
       trapDelay(20);
 
@@ -595,7 +589,7 @@ void trapCapture_Misc() {
       trapDelay(20);
     }
     else {
-      // Strobe colours up.
+      // Strobe up
       Serial1.write(20);
       trapDelay(20);
 
@@ -671,25 +665,15 @@ void trapCapture_Misc() {
 void trapCapture_1989() {
   captureDelay.start(8000);
   boolean capturing = true;
-  int strobeUp = 95;
-  int strobeDown = 50;
-  int strobeCycle = 0;
     
   musicPlayer.stopPlaying();
   b_volume = true;
   musicPlayer.setVolume(volumeL, volumeR);
   musicPlayer.startPlayingFile("cap1989.mp3");
-  
-  boolean b_wait = true;
 
-  // NeoPixels burst
   Serial1.write(6);
-  while(b_wait == true) {
-    if(Serial1.available() > 0) {
-      b_wait = false;
-    }
-  }
-
+  delay(10);
+    
   // Reset the strobe values.
   Serial1.write(7);
 
@@ -697,13 +681,13 @@ void trapCapture_1989() {
   boolean b_light = true;
   float timer1Secs = 0;
   startTimer1();
-  
+
   while(capturing == true) {   
     timer1Secs = getTimer1Seconds(); 
         
     // Update strobe values.
     Serial1.write(8);
-          
+
     if(captureDelay.remaining() <= 4500) {
       // Strobe up
       Serial1.write(9);
@@ -817,6 +801,9 @@ void trapCapture_1984() {
   musicPlayer.setVolume(volumeL, volumeR);
   musicPlayer.startPlayingFile("cap1984.mp3");
 
+  Serial1.write(6);
+  delay(10);
+  /*
   boolean b_wait = true;
 
   // NeoPixels burst
@@ -826,7 +813,8 @@ void trapCapture_1984() {
       b_wait = false;
     }
   }
-
+  */
+  
   // Reset the strobe values.
   Serial1.write(7);
   
@@ -1004,7 +992,11 @@ void loopOpen() {
     autoreset = true;
     //Serial.println(F("** TIMEOUT **"));
   }
+  //checkVolumeEncoder();
 
+  Serial1.write(5);
+  trapDelay(5);
+  /*
   boolean b_wait = true;
   Serial1.write(5);
 
@@ -1015,6 +1007,7 @@ void loopOpen() {
       b_wait = false;
     }
   }
+  */
 }
 
 void preLoopCaptured() {
@@ -1270,7 +1263,7 @@ void checkSwitchPosition() {
     rSwitchLastPosition = rSwitchCurrentPosition;
     int led_colour = LED_OFF;
     boolean led_mix = false;
-    
+        
     if(digitalRead(r1) == LOW) {
       rSwitchCurrentPosition = 1;
       led_colour = LED_YELLOW;
@@ -1589,14 +1582,13 @@ void trapDelay(int bgDelayTime) {
   boolean bg_delay = true;
 
   trapDelay.start(bgDelayTime);
-  
-  while(bg_delay == true) {
+
+  while(trapDelay.isRunning() == true) {
     checkVolumeEncoder();
-    
     if(trapDelay.justFinished()) {
-      bg_delay = false;
+      break;
     }
-  }
+  }  
 }
 
 /*  
